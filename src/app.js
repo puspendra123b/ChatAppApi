@@ -39,6 +39,11 @@ app.use(async (req, res, next) => {
   next();
 });
 
+
+app.get("/", (req, res) => {
+  res.send("The service is working fine");
+});
+
 // Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK" });

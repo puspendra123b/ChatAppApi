@@ -4,6 +4,9 @@ import app from "./app.js";
 import { connectDB } from "./config/db.js";
 import http from "http";
 import { initWebSocket } from "./websocket/wbServer.js";
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first");
 
 const PORT = process.env.PORT || 5000;
 

@@ -6,6 +6,7 @@ import { env } from "../../config/env.js";
 import {
   generateAccessToken,
   generateRefreshToken,
+  verifyToken,
 } from "../../utils/common.js";
 
 export const signup = asyncHandler(async (req, res) => {
@@ -69,4 +70,46 @@ export const login = asyncHandler(async (req, res) => {
     );
   }
   return sendError(res, "Invalid userId/email or password", 401);
+});
+
+export const refreshTokenHandler = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return sendError(res, "Refresh token is required", 400);
+  }
+
+  try {
+    // Verify the refresh token
+    const decoded = verifyToken(refreshToken);
+
+    if (!decoded) {
+      return sendError(res, "Invalid or expired refresh token", 401);
+    }
+
+    // Look up the user to make sure they still exist and are active
+    const userData = await userRepository.findUserByEmail(
+      decoded.email,
+      "email userId",
+    );
+
+    if (!userData) {
+      return sendError(res, "User not found", 401);
+    }
+
+    // Generate fresh tokens
+    const newAccessToken = generateAccessToken(userData);
+    const newRefreshToken = generateRefreshToken(userData);
+
+    return sendSuccess(
+      res,
+      {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
+      "Tokens refreshed successfully",
+    );
+  } catch (error) {
+    return sendError(res, "Invalid or expired refresh token", 401);
+  }
 });

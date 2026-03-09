@@ -1,14 +1,10 @@
-
 import Redis from "ioredis";
 import { env } from "./env.js";
-
 
 let redis;
 
 export async function connectRedis() {
-  redis = new Redis({
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
+  redis = new Redis(env.REDIS_URI, {
     retryStrategy(times) {
       return Math.min(times * 50, 2000);
     },

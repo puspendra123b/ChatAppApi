@@ -11,6 +11,8 @@ import {
 } from "../../utils/common.js";
 import { Otp } from "../otp/otp.model.js";
 import { sendOtpEmail } from "../../services/emailService.js";
+import { getRedis } from "../../config/redis.js";
+
 
 /** Generate a random 6-digit OTP */
 function generateOtp() {
@@ -58,7 +60,10 @@ export const sendOtp = asyncHandler(async (req, res) => {
 
   // Send email
   try {
-    await sendOtpEmail(email, code, purpose);
+    const client = getRedis();
+    // await sendOtpEmail(email, code, purpose);
+    client.lpush("sendMail", JSON.stringify({ email, code, purpose }));
+
   } catch (err) {
     console.error("Failed to send OTP email:", err);
     return sendError(res, "Failed to send OTP email. Check SMTP config.", 500);

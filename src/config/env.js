@@ -15,8 +15,7 @@ export const env = {
 
   DB_URI: required("DB_URI"),
 
-  REDIS_HOST: process.env.REDIS_HOST || "127.0.0.1",
-  REDIS_PORT: process.env.REDIS_PORT || 6379,
+  REDIS_URI: process.env.REDIS_URI || "127.0.0.1",
 
   JWT_SECRET: required("JWT_SECRET"),
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "1h",

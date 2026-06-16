@@ -19,7 +19,7 @@ if (process.env.NODE_ENV !== "production") {
       const server = http.createServer(app);
 
       initWebSocket(server);
-      await connectRedis();
+      // await connectRedis();
 
       server.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);

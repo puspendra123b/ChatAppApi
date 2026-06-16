@@ -7,8 +7,6 @@ import { initWebSocket } from "./websocket/wbServer.js";
 import dns from "dns";
 import { connectRedis } from "./config/redis.js";
 
-dns.setDefaultResultOrder("ipv4first");
-
 const PORT = process.env.PORT || 5000;
 
 // Local development: start HTTP server with WebSocket support
@@ -21,7 +19,7 @@ if (process.env.NODE_ENV !== "production") {
       const server = http.createServer(app);
 
       initWebSocket(server);
-      // await connectRedis();
+      await connectRedis();
 
       server.listen(PORT, () => {
         console.log(`🚀 Server running on port ${PORT}`);

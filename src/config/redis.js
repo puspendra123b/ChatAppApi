@@ -4,21 +4,32 @@ import { env } from "./env.js";
 let redis;
 
 export async function connectRedis() {
-  redis = new Redis(env.REDIS_URI, {
-    retryStrategy(times) {
-      return Math.min(times * 50, 2000);
-    },
-  });
+  return new Promise((resolve, reject) => {
+    redis = new Redis(env.REDIS_URI, {
+      tls: {},
+      maxRetriesPerRequest: null,
+      retryStrategy(times) {
+        if (times > 10) {
+          console.error("Redis: max retries reached, giving up");
+          return null; // stop retrying
+        }
+        return Math.min(times * 200, 2000);
+      },
+    });
 
-  redis.on("connect", () => {
-    console.log("Redis connected");
-  });
+    redis.on("ready", () => {
+      console.log("Redis connected and ready");
+      resolve();
+    });
 
-  redis.on("error", (err) => {
-    console.error("Redis error:", err);
+    redis.on("error", (err) => {
+      console.error("Redis error:", err.message);
+      // Reject only on the first connection attempt
+      if (!redis.status || redis.status === "connecting") {
+        reject(err);
+      }
+    });
   });
-
-  await redis.ping();
 }
 
 export function getRedis() {
